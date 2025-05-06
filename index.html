@@ -152,7 +152,8 @@
       <option value="20">Level 2 (11-20)</option>
       <option value="30">Level 3 (21-30)</option>
       <option value="40">Level 4 (31-40)</option>
-      <option value="50" selected>Level 5 (41-50)</option>
+      <option value="50">Level 5 (41-50)</option>
+      <option value="random" selected>🎲 Random (1–50)</option>
     </select>
     <select id="mode-select">
       <option value="both" selected>Squares & Cubes</option>
@@ -191,6 +192,7 @@
     let timer = 0, timerInterval;
     let maxNum = 50, minNum = 1;
     let mode = 'both';
+    let isRandom = false;
 
     const squareInput = document.getElementById("square-input");
     const cubeInput = document.getElementById("cube-input");
@@ -210,6 +212,10 @@
     const scoreSummary = document.getElementById("score-summary");
     const squareSection = document.getElementById("square-section");
     const cubeSection = document.getElementById("cube-section");
+
+    function getRandomNumber() {
+      return Math.floor(Math.random() * 50) + 1;
+    }
 
     function formatTime(t) {
       const min = Math.floor(t / 60).toString().padStart(2, '0');
@@ -243,29 +249,32 @@
     }
 
     function updateQuestion(isSquare) {
-      const num = isSquare ? squareNum : cubeNum;
       const question = isSquare ? squareQuestion : cubeQuestion;
       const input = isSquare ? squareInput : cubeInput;
       const feedback = isSquare ? squareFeedback : cubeFeedback;
       const progress = isSquare ? squareProgress : cubeProgress;
 
-      if (num <= maxNum) {
-        question.textContent = `What is the ${isSquare ? 'square' : 'cube'} of ${num}?`;
-        input.value = "";
-        input.className = "";
-        feedback.textContent = "";
-        progress.max = maxNum - minNum + 1;
-        progress.value = num - minNum;
-        input.disabled = false;
-        setTimeout(() => input.focus(), 100);
-      } else {
-		progress.value = progress.max;
+      const num = isRandom ? getRandomNumber() : (isSquare ? squareNum : cubeNum);
+      if (isSquare) squareNum = num; else cubeNum = num;
+
+      if (!isRandom && num > maxNum) {
+        progress.value = progress.max;
         question.textContent = `🎉 Finished all ${isSquare ? 'square' : 'cube'} questions!`;
         input.disabled = true;
         if ((mode === 'squares' && isSquare) || (mode === 'cubes' && !isSquare) || (squareNum > maxNum && cubeNum > maxNum)) {
           showSummary();
         }
+        return;
       }
+
+      question.textContent = `What is the ${isSquare ? 'square' : 'cube'} of ${num}?`;
+      input.value = "";
+      input.className = "";
+      feedback.textContent = "";
+      progress.max = maxNum - minNum + 1;
+      if (!isRandom) progress.value = num - minNum;
+      input.disabled = false;
+      setTimeout(() => input.focus(), 100);
     }
 
     function handleAnswer(isSquare) {
@@ -291,17 +300,26 @@
       input.disabled = true;
 
       setTimeout(() => {
-        if (isSquare) squareNum++; else cubeNum++;
+        if (!isRandom) {
+          if (isSquare) squareNum++; else cubeNum++;
+        }
         updateQuestion(isSquare);
       }, 1000);
     }
 
     document.getElementById("start-button").addEventListener("click", () => {
-      const level = parseInt(difficultySelect.value);
-      minNum = level - 9;
-      maxNum = level;
-      mode = modeSelect.value;
+      const level = difficultySelect.value;
+      isRandom = level === "random";
 
+      if (!isRandom) {
+        maxNum = parseInt(level);
+        minNum = maxNum - 9;
+      } else {
+        minNum = 1;
+        maxNum = 50;
+      }
+
+      mode = modeSelect.value;
       squareSection.style.display = (mode === 'squares' || mode === 'both') ? 'block' : 'none';
       cubeSection.style.display = (mode === 'cubes' || mode === 'both') ? 'block' : 'none';
 
@@ -327,16 +345,14 @@
     });
 
     squareInput.addEventListener("input", () => {
-      const num = squareNum;
-      const expected = num * num;
+      const expected = squareNum * squareNum;
       if (parseInt(squareInput.value) === expected || squareInput.value.length >= expected.toString().length) {
         handleAnswer(true);
       }
     });
 
     cubeInput.addEventListener("input", () => {
-      const num = cubeNum;
-      const expected = num * num * num;
+      const expected = cubeNum * cubeNum * cubeNum;
       if (parseInt(cubeInput.value) === expected || cubeInput.value.length >= expected.toString().length) {
         handleAnswer(false);
       }
