@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Squares and Cubes Practice</title>
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/3/3c/Math_icon.png" />
+  <style>
+    :root {
+      --bg-color: #f0f0f0;
+      --card-bg: #fff;
+      --text-color: #000;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding: 2rem;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    body.dark {
+      --bg-color: #263238;
+      --card-bg: #37474f;
+      --text-color: #ffffff;
+    }
+
+    #top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+      animation: fadeInDown 1s ease;
+    }
+
+    button, label, select {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: #90caf9;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button:hover, select:hover {
+      transform: scale(1.05);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .section {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: fadeInUp 1s ease;
+    }
+
+    .question {
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1.2rem;
+      border: 2px solid #ccc;
+      border-radius: 0.5rem;
+      transition: all 0.3s;
+    }
+
+    input.correct {
+      border-color: green;
+      background: #d4f5d4;
+    }
+
+    input.incorrect {
+      border-color: red;
+      background: #f8d4d4;
+    }
+
+    .score, .answer-feedback {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    progress {
+      width: 100%;
+      height: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .timer {
+      font-size: 1.2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .summary {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #e0f7fa;
+      border-radius: 1rem;
+      text-align: center;
+      font-size: 1.1rem;
+      animation: fadeInUp 1s ease;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      .question {
+        font-size: 1.2rem;
+      }
+    }
+
+    body.dark .summary {
+      background: #455a64;
+      color: #ffffff;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="top-controls">
+    <button id="start-button">Start</button>
+    <button id="stop-button">Stop</button>
+    <label><input type="checkbox" id="theme-toggle"> Dark Mode</label>
+    <label><input type="checkbox" id="sound-toggle" checked> Sound</label>
+    <label><input type="checkbox" id="fullscreen-toggle" onclick="toggleFullscreen()"> Fullscreen</label>
+    <select id="difficulty-select">
+      <option value="10">Level 1 (1-10)</option>
+      <option value="20">Level 2 (11-20)</option>
+      <option value="30">Level 3 (21-30)</option>
+      <option value="40">Level 4 (31-40)</option>
+      <option value="50" selected>Level 5 (41-50)</option>
+    </select>
+    <select id="mode-select">
+      <option value="both" selected>Squares & Cubes</option>
+      <option value="squares">Squares Only</option>
+      <option value="cubes">Cubes Only</option>
+    </select>
+  </div>
+
+  <div class="timer" id="timer-display">Time: 00:00</div>
+
+  <div class="grid">
+    <div class="section" id="square-section">
+      <progress id="square-progress" value="0" max="50"></progress>
+      <div class="question" id="square-question">Press Start to begin</div>
+      <input type="number" id="square-input" disabled>
+      <div class="score" id="square-score">Score: 0</div>
+      <div class="answer-feedback" id="square-feedback"></div>
+    </div>
+    <div class="section" id="cube-section">
+      <progress id="cube-progress" value="0" max="50"></progress>
+      <div class="question" id="cube-question">Press Start to begin</div>
+      <input type="number" id="cube-input" disabled>
+      <div class="score" id="cube-score">Score: 0</div>
+      <div class="answer-feedback" id="cube-feedback"></div>
+    </div>
+  </div>
+
+  <div class="summary" id="score-summary" style="display:none"></div>
+
+  <audio id="correct-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_91fa5f1aa8.mp3"></audio>
+  <audio id="incorrect-sound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_b37f9565c1.mp3"></audio>
+
+  <script>
+    let squareNum = 1, cubeNum = 1;
+    let squareScore = 0, cubeScore = 0;
+    let timer = 0, timerInterval;
+    let maxNum = 50, minNum = 1;
+    let mode = 'both';
+
+    const squareInput = document.getElementById("square-input");
+    const cubeInput = document.getElementById("cube-input");
+    const squareQuestion = document.getElementById("square-question");
+    const cubeQuestion = document.getElementById("cube-question");
+    const squareScoreDisplay = document.getElementById("square-score");
+    const cubeScoreDisplay = document.getElementById("cube-score");
+    const squareFeedback = document.getElementById("square-feedback");
+    const cubeFeedback = document.getElementById("cube-feedback");
+    const timerDisplay = document.getElementById("timer-display");
+    const correctSound = document.getElementById("correct-sound");
+    const incorrectSound = document.getElementById("incorrect-sound");
+    const squareProgress = document.getElementById("square-progress");
+    const cubeProgress = document.getElementById("cube-progress");
+    const difficultySelect = document.getElementById("difficulty-select");
+    const modeSelect = document.getElementById("mode-select");
+    const scoreSummary = document.getElementById("score-summary");
+    const squareSection = document.getElementById("square-section");
+    const cubeSection = document.getElementById("cube-section");
+
+    function formatTime(t) {
+      const min = Math.floor(t / 60).toString().padStart(2, '0');
+      const sec = (t % 60).toString().padStart(2, '0');
+      return `${min}:${sec}`;
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timer = 0;
+      timerDisplay.textContent = `Time: 00:00`;
+      timerInterval = setInterval(() => {
+        timer++;
+        timerDisplay.textContent = `Time: ${formatTime(timer)}`;
+      }, 1000);
+    }
+
+    function showSummary() {
+      clearInterval(timerInterval);
+      scoreSummary.style.display = "block";
+      const totalSq = squareNum - 1;
+      const totalCu = cubeNum - 1;
+      const sqAcc = totalSq ? Math.round((squareScore / totalSq) * 100) : 0;
+      const cuAcc = totalCu ? Math.round((cubeScore / totalCu) * 100) : 0;
+      scoreSummary.innerHTML = `
+        <h2>🎉 Game Over!</h2>
+        <p><strong>Squares:</strong><br>✔ Correct: ${squareScore} ❌ Incorrect: ${totalSq - squareScore}<br>Accuracy: ${sqAcc}%</p>
+        <p><strong>Cubes:</strong><br>✔ Correct: ${cubeScore} ❌ Incorrect: ${totalCu - cubeScore}<br>Accuracy: ${cuAcc}%</p>
+        <p><strong>Total Time:</strong> ${formatTime(timer)}</p>
+      `;
+    }
+
+    function updateQuestion(isSquare) {
+      const num = isSquare ? squareNum : cubeNum;
+      const question = isSquare ? squareQuestion : cubeQuestion;
+      const input = isSquare ? squareInput : cubeInput;
+      const feedback = isSquare ? squareFeedback : cubeFeedback;
+      const progress = isSquare ? squareProgress : cubeProgress;
+
+      if (num <= maxNum) {
+        question.textContent = `What is the ${isSquare ? 'square' : 'cube'} of ${num}?`;
+        input.value = "";
+        input.className = "";
+        feedback.textContent = "";
+        progress.max = maxNum - minNum + 1;
+        progress.value = num - minNum;
+        input.disabled = false;
+        setTimeout(() => input.focus(), 100);
+      } else {
+        question.textContent = `🎉 Finished all ${isSquare ? 'square' : 'cube'} questions!`;
+        input.disabled = true;
+        if ((mode === 'squares' && isSquare) || (mode === 'cubes' && !isSquare) || (squareNum > maxNum && cubeNum > maxNum)) {
+          showSummary();
+        }
+      }
+    }
+
+    function handleAnswer(isSquare) {
+      const input = isSquare ? squareInput : cubeInput;
+      const num = isSquare ? squareNum : cubeNum;
+      const expected = isSquare ? num * num : num * num * num;
+      const feedback = isSquare ? squareFeedback : cubeFeedback;
+      const scoreDisplay = isSquare ? squareScoreDisplay : cubeScoreDisplay;
+
+      const val = parseInt(input.value);
+      if (isNaN(val)) return;
+
+      if (val === expected) {
+        input.className = "correct";
+        if (isSquare) squareScore++; else cubeScore++;
+        if (document.getElementById("sound-toggle").checked) correctSound.play();
+      } else {
+        input.className = "incorrect";
+        feedback.textContent = `❌ Correct Answer: ${expected}`;
+        if (document.getElementById("sound-toggle").checked) incorrectSound.play();
+      }
+      scoreDisplay.textContent = `Score: ${isSquare ? squareScore : cubeScore}`;
+      input.disabled = true;
+
+      setTimeout(() => {
+        if (isSquare) squareNum++; else cubeNum++;
+        updateQuestion(isSquare);
+      }, 1000);
+    }
+
+    document.getElementById("start-button").addEventListener("click", () => {
+      const level = parseInt(difficultySelect.value);
+      minNum = level - 9;
+      maxNum = level;
+      mode = modeSelect.value;
+
+      squareSection.style.display = (mode === 'squares' || mode === 'both') ? 'block' : 'none';
+      cubeSection.style.display = (mode === 'cubes' || mode === 'both') ? 'block' : 'none';
+
+      squareNum = cubeNum = minNum;
+      squareScore = cubeScore = 0;
+      squareScoreDisplay.textContent = cubeScoreDisplay.textContent = "Score: 0";
+      squareProgress.value = cubeProgress.value = 0;
+      scoreSummary.style.display = "none";
+      startTimer();
+
+      if (mode !== 'cubes') updateQuestion(true);
+      if (mode !== 'squares') updateQuestion(false);
+    });
+
+    document.getElementById("stop-button").addEventListener("click", () => {
+      clearInterval(timerInterval);
+      squareQuestion.textContent = cubeQuestion.textContent = "Game stopped.";
+      squareInput.disabled = cubeInput.disabled = true;
+    });
+
+    document.getElementById("theme-toggle").addEventListener("change", (e) => {
+      document.body.classList.toggle("dark", e.target.checked);
+    });
+
+    squareInput.addEventListener("input", () => {
+      const num = squareNum;
+      const expected = num * num;
+      if (parseInt(squareInput.value) === expected || squareInput.value.length >= expected.toString().length) {
+        handleAnswer(true);
+      }
+    });
+
+    cubeInput.addEventListener("input", () => {
+      const num = cubeNum;
+      const expected = num * num * num;
+      if (parseInt(cubeInput.value) === expected || cubeInput.value.length >= expected.toString().length) {
+        handleAnswer(false);
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  </script>
+</body>
+</html>
