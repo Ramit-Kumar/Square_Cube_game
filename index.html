@@ -189,10 +189,12 @@
   <script>
     let squareNum = 1, cubeNum = 1;
     let squareScore = 0, cubeScore = 0;
+    let squareTotal = 0, cubeTotal = 0;
     let timer = 0, timerInterval;
     let maxNum = 50, minNum = 1;
     let mode = 'both';
     let isRandom = false;
+
 
     const squareInput = document.getElementById("square-input");
     const cubeInput = document.getElementById("cube-input");
@@ -236,14 +238,14 @@
     function showSummary() {
       clearInterval(timerInterval);
       scoreSummary.style.display = "block";
-      const totalSq = squareNum - 1;
-      const totalCu = cubeNum - 1;
-      const sqAcc = totalSq ? Math.round((squareScore / totalSq) * 100) : 0;
-      const cuAcc = totalCu ? Math.round((cubeScore / totalCu) * 100) : 0;
+
+      const sqAcc = squareTotal ? Math.round((squareScore / squareTotal) * 100) : 0;
+      const cuAcc = cubeTotal ? Math.round((cubeScore / cubeTotal) * 100) : 0;
+
       scoreSummary.innerHTML = `
         <h2>🎉 Game Finished!</h2>
-        <p><strong>Squares:</strong><br>✔ Correct: ${squareScore} ❌ Incorrect: ${totalSq - squareScore}<br>Accuracy: ${sqAcc}%</p>
-        <p><strong>Cubes:</strong><br>✔ Correct: ${cubeScore} ❌ Incorrect: ${totalCu - cubeScore}<br>Accuracy: ${cuAcc}%</p>
+        <p><strong>Squares:</strong><br>✔ Correct: ${squareScore} ❌ Incorrect: ${squareTotal - squareScore}<br>Accuracy: ${sqAcc}%</p>
+        <p><strong>Cubes:</strong><br>✔ Correct: ${cubeScore} ❌ Incorrect: ${cubeTotal - cubeScore}<br>Accuracy: ${cuAcc}%</p>
         <p><strong>Total Time:</strong> ${formatTime(timer)}</p>
       `;
     }
@@ -287,6 +289,8 @@
       const val = parseInt(input.value);
       if (isNaN(val)) return;
 
+      if (isSquare) squareTotal++; else cubeTotal++;
+
       if (val === expected) {
         input.className = "correct";
         if (isSquare) squareScore++; else cubeScore++;
@@ -296,6 +300,7 @@
         feedback.textContent = `❌ Correct Answer: ${expected}`;
         if (document.getElementById("sound-toggle").checked) incorrectSound.play();
       }
+
       scoreDisplay.textContent = `Score: ${isSquare ? squareScore : cubeScore}`;
       input.disabled = true;
 
@@ -325,6 +330,7 @@
 
       squareNum = cubeNum = minNum;
       squareScore = cubeScore = 0;
+      squareTotal = cubeTotal = 0;
       squareScoreDisplay.textContent = cubeScoreDisplay.textContent = "Score: 0";
       squareProgress.value = cubeProgress.value = 0;
       scoreSummary.style.display = "none";
