@@ -259,6 +259,7 @@
         input.disabled = false;
         setTimeout(() => input.focus(), 100);
       } else {
+		progress.value = progress.max;
         question.textContent = `🎉 Finished all ${isSquare ? 'square' : 'cube'} questions!`;
         input.disabled = true;
         if ((mode === 'squares' && isSquare) || (mode === 'cubes' && !isSquare) || (squareNum > maxNum && cubeNum > maxNum)) {
