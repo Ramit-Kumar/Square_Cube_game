@@ -235,7 +235,7 @@
       const sqAcc = totalSq ? Math.round((squareScore / totalSq) * 100) : 0;
       const cuAcc = totalCu ? Math.round((cubeScore / totalCu) * 100) : 0;
       scoreSummary.innerHTML = `
-        <h2>🎉 Game Over!</h2>
+        <h2>🎉 Game Finished!</h2>
         <p><strong>Squares:</strong><br>✔ Correct: ${squareScore} ❌ Incorrect: ${totalSq - squareScore}<br>Accuracy: ${sqAcc}%</p>
         <p><strong>Cubes:</strong><br>✔ Correct: ${cubeScore} ❌ Incorrect: ${totalCu - cubeScore}<br>Accuracy: ${cuAcc}%</p>
         <p><strong>Total Time:</strong> ${formatTime(timer)}</p>
