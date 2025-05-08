@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Squares and Cubes Practice</title>
   <link rel="icon" type="image/png" href="./dice.png" />
-  <style>
+ <style>
     :root {
       --bg-color: #f0f0f0;
       --card-bg: #fff;
@@ -115,6 +115,13 @@
       animation: fadeInUp 1s ease;
     }
 
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 1rem;
@@ -127,6 +134,10 @@
     body.dark .summary {
       background: #455a64;
       color: #ffffff;
+    }
+
+    body.dark footer {
+      color: #bbb;
     }
 
     @keyframes fadeInUp {
@@ -182,6 +193,11 @@
   </div>
 
   <div class="summary" id="score-summary" style="display:none"></div>
+  
+  <footer>
+    &copy; 2025 Squares and Cubes Practice | Made for educational purposes.
+	<p>ramit-kumar-edition</p>
+  </footer>
 
   <audio id="correct-sound" src="./correct-choice.mp3"></audio>
   <audio id="incorrect-sound" src="./wrong-answer.wav"></audio>
