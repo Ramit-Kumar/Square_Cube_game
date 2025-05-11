@@ -4,123 +4,221 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Squares and Cubes Practice</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="./dice.png" />
  <style>
     :root {
-      --bg-color: #f0f0f0;
-      --card-bg: #fff;
-      --text-color: #000;
-    }
+  --bg-gradient: linear-gradient(to right, #e0f7fa, #fff3e0);
+  --card-bg: #ffffffcc;
+  --text-color: #222;
+  --primary-gradient: linear-gradient(135deg, #42a5f5, #478ed1);
+  --accent-gradient: linear-gradient(135deg, #66bb6a, #43a047);
+  --footer-bg: rgba(0, 0, 0, 0.05);
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex: 1; /* this makes it take up all available space */
+  padding: 2rem;
+}
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: var(--bg-color);
-      color: var(--text-color);
-      padding: 2rem;
-      transition: background 0.5s, color 0.5s;
-    }
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background: var(--bg-gradient);
+  color: var(--text-color);
+  padding: 2rem;
+  transition: background 0.5s, color 0.5s;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-    body.dark {
-      --bg-color: #263238;
-      --card-bg: #37474f;
-      --text-color: #ffffff;
-    }
+body.dark {
+  --bg-gradient: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+  --card-bg: #37474fcc;
+  --text-color: #ffffff;
+  --footer-bg: linear-gradient(to right, #37474f, #263238);
+}
 
-    #top-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
-      margin-bottom: 1rem;
-      animation: fadeInDown 1s ease;
-    }
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  animation: fadeSlideDown 1s ease;
+}
 
-    button, label, select {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #90caf9;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
+.main-title {
+  font-size: 2rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #2196f3, #9c27b0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
 
-    button:hover, select:hover {
-      transform: scale(1.05);
-    }
+.tagline {
+  font-size: 1.1rem;
+  color: #666;
+  animation: fadeIn 2s ease;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
+body.dark .tagline {
+  color: #bbb;
+}
 
-    .section {
-      background: var(--card-bg);
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      animation: fadeInUp 1s ease;
-    }
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-    .question {
-      font-size: 1.4rem;
-      margin-bottom: 0.75rem;
-    }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-    input[type="number"] {
-      width: 100%;
-      padding: 0.5rem;
-      font-size: 1.2rem;
-      border: 2px solid #ccc;
-      border-radius: 0.5rem;
-      transition: all 0.3s;
-    }
 
-    input.correct {
-      border-color: green;
-      background: #d4f5d4;
-    }
+#top-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  animation: fadeInDown 1s ease;
+}
 
-    input.incorrect {
-      border-color: red;
-      background: #f8d4d4;
-    }
+button, select, label {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-image: var(--primary-gradient);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+}
 
-    .score, .answer-feedback {
-      margin-top: 1rem;
-      font-weight: bold;
-    }
+button:hover, select:hover {
+  transform: scale(1.05);
+  background-image: var(--accent-gradient);
+}
 
-    progress {
-      width: 100%;
-      height: 12px;
-      margin-bottom: 1rem;
-    }
+select {
+  appearance: none;
+  background-image: var(--primary-gradient);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-    .timer {
-      font-size: 1.2rem;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
+select option {
+  color: #000;
+  background-color: #fff;
+}
 
-    .summary {
-      margin-top: 2rem;
-      padding: 1rem;
-      background: #e0f7fa;
-      border-radius: 1rem;
-      text-align: center;
-      font-size: 1.1rem;
-      animation: fadeInUp 1s ease;
-    }
+body.dark select option {
+  color: #fff;
+  background-color: #424242;
+}
 
-    footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #666;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  flex-grow: 1;
+}
+
+.section {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  animation: fadeInUp 1s ease;
+  backdrop-filter: blur(8px);
+}
+
+.question {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1.2rem;
+  border: 2px solid #ccc;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+}
+
+input.correct {
+  border-color: #4caf50;
+  background: #e8f5e9;
+}
+
+input.incorrect {
+  border-color: #e53935;
+  background: #ffebee;
+}
+
+.score, .answer-feedback {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+progress {
+  width: 100%;
+  height: 10px;
+  margin-bottom: 1rem;
+  appearance: none;
+}
+
+.timer {
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.summary {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #fce4ec;
+  border-radius: 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+  animation: fadeInUp 1s ease;
+  color: #000;
+}
+
+   footer {
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 0.95rem;
+  color: #666;
+  background: var(--footer-bg);
+  margin-top: auto;
+  border-top: 1px solid #ccc;
+}
 
     @media (max-width: 600px) {
       body {
@@ -129,16 +227,32 @@
       .question {
         font-size: 1.2rem;
       }
+	  .main-title {
+    font-size: 1.8rem;
+  }
+
+  .tagline {
+    font-size: 1rem;
+  }
     }
 
     body.dark .summary {
-      background: #455a64;
-      color: #ffffff;
-    }
+  background: #4e6e7c;
+  color: #fff;
+}
+body.dark footer {
+  color: #bbb;
+  border-top-color: #555;
+}
 
-    body.dark footer {
-      color: #bbb;
-    }
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+  .question {
+    font-size: 1.3rem;
+  }
+}
 
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -152,6 +266,13 @@
   </style>
 </head>
 <body>
+<div class="container">
+	<div class="header">
+  <h1 class="main-title">🔢Squares and Cubes Practice🔢</h1>
+  <p class="tagline">Sharpen your math skills with squares and cubes!</p>
+</div>
+
+
   <div id="top-controls">
     <button id="start-button">Start</button>
     <button id="stop-button">Stop</button>
@@ -193,7 +314,8 @@
   </div>
 
   <div class="summary" id="score-summary" style="display:none"></div>
-  
+  </div>
+ 
   <footer>
     &copy; 2025 Squares and Cubes Practice | Made for educational purposes.
 	<p>ramit-kumar-edition</p>
@@ -387,6 +509,38 @@
         document.exitFullscreen();
       }
     }
+	
+	document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT") return; // Ignore if typing in input box
+
+  switch (e.key.toLowerCase()) {
+    case "s": // Start
+      document.getElementById("start-button").click();
+      break;
+    case "a": // Stop
+      document.getElementById("stop-button").click();
+      break;
+    case "d": // Dark mode toggle
+      const darkToggle = document.getElementById("theme-toggle");
+      darkToggle.checked = !darkToggle.checked;
+      darkToggle.dispatchEvent(new Event("change"));
+      break;
+    case "f": // Fullscreen toggle
+      document.getElementById("fullscreen-toggle").click();
+      break;
+    case "m": // Mute toggle
+      const soundToggle = document.getElementById("sound-toggle");
+      soundToggle.checked = !soundToggle.checked;
+      break;
+    case "l": // Focus difficulty dropdown
+      document.getElementById("difficulty-select").focus();
+      break;
+    case "c": // Focus square/cube mode dropdown
+      document.getElementById("mode-select").focus();
+      break;
+  }
+});
+
   </script>
 </body>
 </html>
