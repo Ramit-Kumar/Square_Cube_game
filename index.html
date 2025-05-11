@@ -315,11 +315,11 @@ body.dark footer {
   </style>
 </head>
 <body>
-<div class="container">
-	<div class="header">
-  <h1 class="main-title">🔢Squares and Cubes Practice🔢</h1>
-  <p class="tagline">Sharpen your math skills with squares and cubes!</p>
-</div>
+  <div class="container">
+  <div class="header">
+	<h1 class="main-title">🔢Squares and Cubes Practice🔢</h1>
+	<p class="tagline">Sharpen your math skills with squares and cubes!</p>
+  </div>
 
 
   <div id="top-controls">
@@ -381,6 +381,9 @@ body.dark footer {
     let maxNum = 50, minNum = 1;
     let mode = 'both';
     let isRandom = false;
+	let squareRandomCount = 0;
+	let cubeRandomCount = 0;
+
 
 
     const squareInput = document.getElementById("square-input");
@@ -461,7 +464,17 @@ body.dark footer {
       input.className = "";
       feedback.textContent = "";
       progress.max = maxNum - minNum + 1;
-      if (!isRandom) progress.value = num - minNum;
+      if (isRandom) {
+	  if (isSquare) {
+       squareRandomCount++;
+       progress.value = squareRandomCount;
+	 } else {
+       cubeRandomCount++;
+       progress.value = cubeRandomCount;
+	 }
+	 } else {
+	   progress.value = num - minNum;
+	 }
       input.disabled = false;
       setTimeout(() => input.focus(), 100);
     }
@@ -520,6 +533,8 @@ body.dark footer {
       squareTotal = cubeTotal = 0;
       squareScoreDisplay.textContent = cubeScoreDisplay.textContent = "Score: 0";
       squareProgress.value = cubeProgress.value = 0;
+	  squareRandomCount = 0;
+	  cubeRandomCount = 0;
       scoreSummary.style.display = "none";
       startTimer();
 
