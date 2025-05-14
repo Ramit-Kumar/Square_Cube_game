@@ -383,6 +383,9 @@ body.dark footer {
     let isRandom = false;
 	let squareRandomCount = 0;
 	let cubeRandomCount = 0;
+	let incorrectSquares = [];
+	let incorrectCubes = [];
+
 
 
 
@@ -426,19 +429,30 @@ body.dark footer {
     }
 
     function showSummary() {
-      clearInterval(timerInterval);
-      scoreSummary.style.display = "block";
+  clearInterval(timerInterval);
+  scoreSummary.style.display = "block";
 
-      const sqAcc = squareTotal ? Math.round((squareScore / squareTotal) * 100) : 0;
-      const cuAcc = cubeTotal ? Math.round((cubeScore / cubeTotal) * 100) : 0;
+  const sqAcc = squareTotal ? Math.round((squareScore / squareTotal) * 100) : 0;
+  const cuAcc = cubeTotal ? Math.round((cubeScore / cubeTotal) * 100) : 0;
 
-      scoreSummary.innerHTML = `
-        <h2>🎉 Game Finished!</h2>
-        <p><strong>Squares:</strong><br>✔ Correct: ${squareScore} ❌ Incorrect: ${squareTotal - squareScore}<br>Accuracy: ${sqAcc}%</p>
-        <p><strong>Cubes:</strong><br>✔ Correct: ${cubeScore} ❌ Incorrect: ${cubeTotal - cubeScore}<br>Accuracy: ${cuAcc}%</p>
-        <p><strong>Total Time:</strong> ${formatTime(timer)}</p>
-      `;
-    }
+  const sqMistakes = incorrectSquares.map(q =>
+    `<li>${q.num}² = <strong>${q.expected}</strong> (You said: ${q.user})</li>`
+  ).join('');
+
+  const cuMistakes = incorrectCubes.map(q =>
+    `<li>${q.num}³ = <strong>${q.expected}</strong> (You said: ${q.user})</li>`
+  ).join('');
+
+  scoreSummary.innerHTML = `
+    <h2>🎉 Game Finished!</h2>
+    <p><strong>Squares:</strong><br>✔ Correct: ${squareScore} ❌ Incorrect: ${squareTotal - squareScore}<br>Accuracy: ${sqAcc}%</p>
+    ${sqMistakes ? `<details><summary>Incorrect Squares</summary><ul>${sqMistakes}</ul></details>` : ''}
+    <p><strong>Cubes:</strong><br>✔ Correct: ${cubeScore} ❌ Incorrect: ${cubeTotal - cubeScore}<br>Accuracy: ${cuAcc}%</p>
+    ${cuMistakes ? `<details><summary>Incorrect Cubes</summary><ul>${cuMistakes}</ul></details>` : ''}
+    <p><strong>Total Time:</strong> ${formatTime(timer)}</p>
+  `;
+}
+
 
     function updateQuestion(isSquare) {
       const question = isSquare ? squareQuestion : cubeQuestion;
@@ -499,6 +513,11 @@ body.dark footer {
         input.className = "incorrect";
         feedback.textContent = `❌ Correct Answer: ${expected}`;
         if (document.getElementById("sound-toggle").checked) incorrectSound.play();
+		if (isSquare) {
+    incorrectSquares.push({ num, expected, user: val });
+  } else {
+    incorrectCubes.push({ num, expected, user: val });
+  }
       }
 
       scoreDisplay.textContent = `Score: ${isSquare ? squareScore : cubeScore}`;
@@ -515,6 +534,9 @@ body.dark footer {
     document.getElementById("start-button").addEventListener("click", () => {
       const level = difficultySelect.value;
       isRandom = level === "random";
+	  
+	  incorrectSquares = [];
+	incorrectCubes = [];
 
       if (!isRandom) {
         maxNum = parseInt(level);
